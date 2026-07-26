@@ -1,4 +1,4 @@
-# Recipe Hub 🍳
+# Recipe Hub 
 
 A Flutter application that fetches recipes from a public REST API and displays them in a clean, responsive grid, with a detailed recipe view.
 
