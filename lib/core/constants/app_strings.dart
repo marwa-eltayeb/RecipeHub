@@ -10,4 +10,5 @@ class AppStrings {
   static const String filterByCuisine = 'Filter by Cuisine';
   static const String clearFilter = 'Clear Filter';
   static const String searchHint = 'Search recipes';
+  static const String tryAgain = 'Try Again';
 }

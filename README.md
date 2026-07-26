@@ -9,7 +9,8 @@ A Flutter application that fetches recipes from a public REST API and displays t
 - **Cuisine Filter** — filter recipes by cuisine using selectable chips (client-side)
 - **Details Screen** — shows full recipe information: ingredients, instructions, prep/cook time, and difficulty
 - **Responsive Design** — grid layout adapts column count and padding based on screen width (mobile vs tablet)
-- **Reusable Widgets** — `CustomText`, `RecipeItem`, `RecipeStatBadge`, `CustomSearchBar`, `FilterChipItem` used
+- **Reusable Widgets** — `CustomText`, `RecipeItem`, `RecipeStatBadge`, `CustomSearchBar`, `FilterChipItem`, `ErrorStateView` used
+- **Error Handling** — friendly error messages with a retry action on failed requests
 - **Feature-First Architecture** — code is organized by feature (`features/home/`), with data and presentation layers separated within each feature
 
 ## 🛠️ Tech Stack
@@ -36,6 +37,8 @@ lib/
 │   │   └── api_constant.dart
 │   ├── di/
 │   │   └── service_locator.dart
+│   ├── error/
+│   │   └── app_exception.dart
 │   └── routing/
 │       ├── app_router.dart
 │       └── routes.dart
@@ -59,7 +62,8 @@ lib/
 │               ├── recipe_stat_badge.dart
 │               ├── custom_search_bar.dart
 │               ├── filter_chip_item.dart
-│               └── filter_bottom_sheet.dart
+│               ├── filter_bottom_sheet.dart
+│               └── error_state_view.dart
 └── main.dart
 ```
 
@@ -70,7 +74,7 @@ UI (Screens) → Cubit → Repository → Dio → API
 ```
 
 - **Model** — maps raw JSON to `RecipeModel`
-- **Repository** — abstracts the data source (API call)
+- **Repository** — abstracts the data source (API call) and turns network errors into a simple `AppException`
 - **Cubit** — manages UI state (loading / success / error)
 - **Service Locator (get_it)** — builds and injects dependencies
 

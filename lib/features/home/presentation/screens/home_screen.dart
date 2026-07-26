@@ -6,6 +6,7 @@ import 'package:recipe_hub/core/di/service_locator.dart';
 import 'package:recipe_hub/core/routing/routes.dart';
 import 'package:recipe_hub/features/home/presentation/cubit/recipe_cubit.dart';
 import 'package:recipe_hub/features/home/presentation/cubit/recipe_state.dart';
+import 'package:recipe_hub/features/home/presentation/widgets/error_state_view.dart';
 import 'package:recipe_hub/features/home/presentation/widgets/recipe_item.dart';
 import 'package:recipe_hub/features/home/presentation/widgets/custom_search_bar.dart';
 import 'package:recipe_hub/features/home/presentation/widgets/filter_bottom_sheet.dart';
@@ -83,7 +84,10 @@ class _HomeScreenState extends State<HomeScreen> {
                               child: CircularProgressIndicator(color: AppColors.primary),
                             );
                           } else if (state is ErrorState) {
-                            return Center(child: Text(state.errorMessage));
+                            return ErrorStateView(
+                              message: state.errorMessage,
+                              onRetry: cubit.getRecipes,
+                            );
                           } else if (state is SuccessState) {
                             if (state.recipes.isEmpty) {
                               return const Center(child: Text(AppStrings.noRecipesFound));

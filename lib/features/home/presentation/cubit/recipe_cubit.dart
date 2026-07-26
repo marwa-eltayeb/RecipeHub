@@ -1,4 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:recipe_hub/core/error/app_exception.dart';
 import 'package:recipe_hub/features/home/data/repository/recipe_repository.dart';
 import 'package:recipe_hub/features/home/data/model/recipe_model.dart';
 import 'recipe_state.dart';
@@ -22,8 +23,10 @@ class RecipeCubit extends Cubit<RecipeState> {
       final recipes = await recipeRepository.getRecipes();
       _allRecipes = recipes;
       emit(SuccessState(recipes: recipes));
+    } on AppException catch (e) {
+      emit(ErrorState(errorMessage: e.message));
     } catch (e) {
-      emit(ErrorState(errorMessage: e.toString()));
+      emit(ErrorState(errorMessage: 'Something went wrong. Please try again.'));
     }
   }
 
