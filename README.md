@@ -7,9 +7,9 @@ A Flutter application that fetches recipes from a public REST API and displays t
 - **Home Screen** — displays a responsive grid of recipes fetched from a live API
 - **Search** — filter recipes by name in real time (client-side)
 - **Cuisine Filter** — filter recipes by cuisine using selectable chips (client-side)
-- **Details Screen** — shows full recipe information: ingredients, step-by-step instructions, prep/cook time, and difficulty
+- **Details Screen** — shows full recipe information: ingredients, instructions, prep/cook time, and difficulty
 - **Responsive Design** — grid layout adapts column count and padding based on screen width (mobile vs tablet)
-- **Reusable Widgets** — `CustomText`, `RecipeItem`, `RecipeStatBadge`, `CustomSearchBar`, `FilterChipItem` used across multiple screens
+- **Reusable Widgets** — `CustomText`, `RecipeItem`, `RecipeStatBadge`, `CustomSearchBar`, `FilterChipItem` used
 - **Feature-First Architecture** — code is organized by feature (`features/home/`), with data and presentation layers separated within each feature
 
 ## 🛠️ Tech Stack
