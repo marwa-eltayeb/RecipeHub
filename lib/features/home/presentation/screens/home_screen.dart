@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:recipe_hub/core/constants/app_colors.dart';
 import 'package:recipe_hub/core/constants/app_strings.dart';
 import 'package:recipe_hub/core/di/service_locator.dart';
+import 'package:recipe_hub/core/routing/routes.dart';
 import 'package:recipe_hub/features/home/presentation/cubit/recipe_cubit.dart';
 import 'package:recipe_hub/features/home/presentation/cubit/recipe_state.dart';
 import 'package:recipe_hub/features/home/presentation/widgets/recipe_item.dart';
@@ -58,7 +59,11 @@ class HomeScreen extends StatelessWidget {
                           return InkWell(
                             borderRadius: BorderRadius.circular(12),
                             onTap: () {
-                              // Navigate to details screen
+                              Navigator.pushNamed(
+                                context,
+                                Routes.detailsScreen,
+                                arguments: recipe,
+                              );
                             },
                             child: RecipeItem(
                               imageUrl: recipe.image,
