@@ -7,82 +7,147 @@ import 'package:recipe_hub/core/routing/routes.dart';
 import 'package:recipe_hub/features/home/presentation/cubit/recipe_cubit.dart';
 import 'package:recipe_hub/features/home/presentation/cubit/recipe_state.dart';
 import 'package:recipe_hub/features/home/presentation/widgets/recipe_item.dart';
+import 'package:recipe_hub/features/home/presentation/widgets/custom_search_bar.dart';
+import 'package:recipe_hub/features/home/presentation/widgets/filter_bottom_sheet.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  final TextEditingController _searchController = TextEditingController();
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (context) => getIt<RecipeCubit>()..getRecipes(),
-      child: BlocBuilder<RecipeCubit, RecipeState>(
-        builder: (context, state) {
-          if (state is LoadingState) {
-            return const Scaffold(
-              body: Center(child: CircularProgressIndicator(color: AppColors.primary)),
-            );
-          } else if (state is ErrorState) {
-            return Scaffold(
-              body: Center(child: Text(state.errorMessage)),
-            );
-          } else if (state is SuccessState) {
-            if (state.recipes.isEmpty) {
-              return const Scaffold(
-                body: Center(child: Text(AppStrings.noRecipesFound)),
-              );
-            }
+      child: Builder(
+        builder: (context) {
+          final cubit = context.read<RecipeCubit>();
 
-            return Scaffold(
+          return Scaffold(
+            backgroundColor: AppColors.background,
+            appBar: AppBar(
+              title: const Text(AppStrings.appTitle),
               backgroundColor: AppColors.background,
-              appBar: AppBar(
-                title: const Text(AppStrings.appTitle),
-                backgroundColor: AppColors.background,
-                elevation: 0,
-              ),
-              body: SafeArea(
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: LayoutBuilder(
-                    builder: (context, constraints) {
-                      final crossAxisCount = constraints.maxWidth > 600 ? 3 : 2;
-                      return GridView.builder(
-                        padding: const EdgeInsets.only(top: 5, bottom: 5),
-                        itemCount: state.recipes.length,
-                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: crossAxisCount,
-                          crossAxisSpacing: 10,
-                          mainAxisSpacing: 15,
-                          mainAxisExtent: 230,
+              elevation: 0,
+            ),
+            body: SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Column(
+                  children: [
+                    Row(
+                      children: [
+                        Expanded(
+                          child: CustomSearchBar(
+                            controller: _searchController,
+                            onChanged: cubit.searchRecipes,
+                            onClear: () => cubit.searchRecipes(''),
+                          ),
                         ),
-                        itemBuilder: (context, index) {
-                          final recipe = state.recipes[index];
-                          return InkWell(
+
+                        const SizedBox(width: 8),
+
+                        Container(
+                          height: 50,
+                          width: 50,
+                          decoration: BoxDecoration(
+                            color: AppColors.cardBackground,
                             borderRadius: BorderRadius.circular(12),
-                            onTap: () {
-                              Navigator.pushNamed(
-                                context,
-                                Routes.detailsScreen,
-                                arguments: recipe,
-                              );
-                            },
-                            child: RecipeItem(
-                              imageUrl: recipe.image,
-                              name: recipe.name,
-                              cuisine: recipe.cuisine,
-                              rating: recipe.rating,
-                            ),
-                          );
+                          ),
+                          child: IconButton(
+                            icon: const Icon(Icons.tune, color: AppColors.primary),
+                            onPressed: () => _openFilterSheet(context, cubit),
+                          ),
+                        ),
+                      ],
+                    ),
+
+                    const SizedBox(height: 12),
+
+                    Expanded(
+                      child: BlocBuilder<RecipeCubit, RecipeState>(
+                        builder: (context, state) {
+                          if (state is LoadingState) {
+                            return const Center(
+                              child: CircularProgressIndicator(color: AppColors.primary),
+                            );
+                          } else if (state is ErrorState) {
+                            return Center(child: Text(state.errorMessage));
+                          } else if (state is SuccessState) {
+                            if (state.recipes.isEmpty) {
+                              return const Center(child: Text(AppStrings.noRecipesFound));
+                            }
+
+                            return LayoutBuilder(
+                              builder: (context, constraints) {
+                                final crossAxisCount = constraints.maxWidth > 600 ? 3 : 2;
+                                return GridView.builder(
+                                  padding: const EdgeInsets.only(top: 5, bottom: 5),
+                                  itemCount: state.recipes.length,
+                                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                                    crossAxisCount: crossAxisCount,
+                                    crossAxisSpacing: 10,
+                                    mainAxisSpacing: 15,
+                                    mainAxisExtent: 230,
+                                  ),
+                                  itemBuilder: (context, index) {
+                                    final recipe = state.recipes[index];
+                                    return InkWell(
+                                      borderRadius: BorderRadius.circular(12),
+                                      onTap: () {
+                                        Navigator.pushNamed(
+                                          context,
+                                          Routes.detailsScreen,
+                                          arguments: recipe,
+                                        );
+                                      },
+                                      child: RecipeItem(
+                                        imageUrl: recipe.image,
+                                        name: recipe.name,
+                                        cuisine: recipe.cuisine,
+                                        rating: recipe.rating,
+                                      ),
+                                    );
+                                  },
+                                );
+                              },
+                            );
+                          }
+                          return const SizedBox();
                         },
-                      );
-                    },
-                  ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
-            );
-          } else {
-            return const Scaffold();
-          }
+            ),
+          );
         },
+      ),
+    );
+  }
+
+  void _openFilterSheet(BuildContext context, RecipeCubit cubit) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      builder: (_) => FilterBottomSheet(
+        cuisines: cubit.availableCuisines,
+        selectedCuisine: cubit.selectedCuisine,
+        onCuisineSelected: cubit.filterByCuisine,
+        onClearFilter: cubit.clearFilters,
       ),
     );
   }
